@@ -1,0 +1,557 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVECC - New Member Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .signup-container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .club-header {
+            background: linear-gradient(135deg, var(--success), #2ecc71);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        .club-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .club-logo-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            margin-bottom: 12px;
+            background-color: white;
+            padding: 5px;
+        }
+        
+        /* Fallback logo when image fails */
+        .fallback-logo {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            font-weight: bold;
+            border: 4px solid white;
+            margin-bottom: 12px;
+        }
+        
+        .club-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+        
+        .club-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .signup-form-section {
+            padding: 30px 20px;
+        }
+        
+        .signup-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .signup-header h2 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .signup-header p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 1rem;
+        }
+        
+        .input-with-icon input {
+            width: 100%;
+            padding: 14px 14px 14px 40px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .input-with-icon input:focus {
+            outline: none;
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            gap: 10px;
+        }
+        
+        .btn-signup {
+            background: linear-gradient(135deg, var(--success), #2ecc71);
+            color: white;
+            margin-top: 10px;
+        }
+        
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-back {
+            background: var(--light);
+            color: var(--dark);
+            margin-top: 12px;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .btn-back:hover {
+            background: #dfe6e9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-login-now {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            margin-top: 15px;
+        }
+        
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result-section {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--success);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .result-section.show {
+            display: block;
+        }
+        
+        .result-section h3 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--success);
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+        
+        .id-card-display {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px dashed var(--success);
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        .id-number {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: 2px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .note {
+            color: var(--gray);
+            font-size: 0.8rem;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        
+        .signup-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--gray);
+            font-size: 0.8rem;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .signup-footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .signup-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Mobile-specific adjustments */
+        @media (max-width: 400px) {
+            body {
+                padding: 10px;
+            }
+            
+            .signup-container {
+                border-radius: 12px;
+            }
+            
+            .club-header {
+                padding: 20px 15px;
+            }
+            
+            .signup-form-section {
+                padding: 25px 15px;
+            }
+            
+            .club-logo-img,
+            .fallback-logo {
+                width: 80px;
+                height: 80px;
+                font-size: 1.5rem;
+            }
+            
+            .club-name {
+                font-size: 1.2rem;
+            }
+            
+            .signup-header h2 {
+                font-size: 1.3rem;
+            }
+            
+            .btn {
+                padding: 14px;
+                font-size: 0.95rem;
+            }
+            
+            .id-number {
+                font-size: 1.4rem;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            .club-logo-img,
+            .fallback-logo {
+                width: 70px;
+                height: 70px;
+                font-size: 1.3rem;
+            }
+            
+            .club-name {
+                font-size: 1.1rem;
+            }
+            
+            .input-with-icon input {
+                padding: 12px 12px 12px 40px;
+                font-size: 0.95rem;
+            }
+            
+            .signup-header h2 {
+                font-size: 1.2rem;
+            }
+            
+            .id-number {
+                font-size: 1.2rem;
+            }
+        }
+        
+        /* Touch-friendly input sizes */
+        @media (hover: none) and (pointer: coarse) {
+            .input-with-icon input {
+                font-size: 16px;
+            }
+            
+            .btn {
+                min-height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <!-- Club Header -->
+        <div class="club-header">
+            <div class="club-logo-container">
+                <img src="logo.jpeg" alt="Club Logo" class="club-logo-img" 
+                     onerror="this.onerror=null; this.style.display='none'; 
+                              document.getElementById('fallbackLogo').style.display='flex';">
+                <div class="fallback-logo" id="fallbackLogo" style="display: none;">CV</div>
+                <div class="club-name">CHOWDHURIVITA<br>EDUCATION CULTURE CLUB</div>
+                <div class="club-subtitle">New Member Registration</div>
+            </div>
+        </div>
+        
+        <!-- Signup Form -->
+        <div class="signup-form-section">
+            <div class="signup-header">
+                <h2>Create Member Account</h2>
+                <p>Fill in your details to register as a new member</p>
+            </div>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="name" placeholder="Enter your full name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                        <input type="tel" id="mobile" placeholder="Enter 10-digit mobile number" 
+                               required maxlength="10" pattern="[0-9]{10}">
+                    </div>
+                    <p class="note">This will be used for login and communication</p>
+                </div>
+                
+                <button type="submit" class="btn btn-signup" id="signupButton">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <button type="button" class="btn btn-back" id="backButton">
+                    <i class="fas fa-arrow-left"></i> Back to Login
+                </button>
+            </form>
+            
+            <!-- Result Display -->
+            <div class="result-section" id="resultSection">
+                <h3><i class="fas fa-check-circle"></i> Registration Successful!</h3>
+                <p>Your member account has been created successfully.</p>
+                
+                <div class="id-card-display">
+                    <p><strong>Your ID Card Number:</strong></p>
+                    <div class="id-number" id="idCardDisplay"></div>
+                    <p>Please save this number for future login</p>
+                </div>
+                
+                <p class="note">
+                    <i class="fas fa-info-circle"></i> 
+                    Use this ID Card Number with your mobile number to login
+                </p>
+                
+                <button type="button" class="btn btn-login-now" id="loginNowButton">
+                    <i class="fas fa-sign-in-alt"></i> Login Now
+                </button>
+            </div>
+            
+            <div class="signup-footer">
+                <p>Already have an account? <a href="login.html">Login here</a></p>
+                <p style="margin-top: 10px; font-size: 0.75rem;">
+                    &copy; 2026 CVECC
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+        const signupForm = document.getElementById('signupForm');
+        const signupButton = document.getElementById('signupButton');
+        const backButton = document.getElementById('backButton');
+        const resultSection = document.getElementById('resultSection');
+        const idCardDisplay = document.getElementById('idCardDisplay');
+        const loginNowButton = document.getElementById('loginNowButton');
+        const nameInput = document.getElementById('name');
+        const mobileInput = document.getElementById('mobile');
+
+        // Mobile number validation
+        mobileInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 10) {
+                this.value = this.value.slice(0, 10);
+            }
+        });
+
+        // Form submission
+        signupForm.addEventListener('submit', async e => {
+            e.preventDefault();
+
+            const name = nameInput.value.trim();
+            const mobile = mobileInput.value.trim();
+
+            // Validation
+            if (!name || name.length < 3) {
+                alert('Please enter a valid full name (at least 3 characters)');
+                return;
+            }
+
+            if (!/^\d{10}$/.test(mobile)) {
+                alert('Please enter a valid 10-digit mobile number');
+                return;
+            }
+
+            // Disable button and show loading
+            signupButton.disabled = true;
+            const originalText = signupButton.innerHTML;
+            signupButton.innerHTML = '<div class="loading"></div> Creating Account...';
+
+            try {
+                const res = await fetch(`${API}/members/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, mobile })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || 'Registration failed');
+                }
+
+                // Show success result
+                idCardDisplay.textContent = data.idCardNo;
+                resultSection.classList.add('show');
+                
+                // Scroll to result
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert(error.message || 'Network error. Please try again.');
+            } finally {
+                // Reset button
+                signupButton.disabled = false;
+                signupButton.innerHTML = originalText;
+            }
+        });
+
+        // Back to login
+        backButton.addEventListener('click', function() {
+            window.location.href = 'login.html';
+        });
+
+        // Login now button
+        loginNowButton.addEventListener('click', function() {
+            window.location.href = 'login.html';
+        });
+
+        // Focus on name input when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            nameInput.focus();
+        });
+
+        // Enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !resultSection.classList.contains('show')) {
+                signupButton.click();
+            }
+        });
+    </script>
+</body>
+</html>
