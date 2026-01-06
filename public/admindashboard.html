@@ -35,8 +35,8 @@
             overflow-x: hidden;
         }
         
-        /* /* Mobile Menu Toggle */
-         .mobile-menu-toggle {
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
             display: none;
             position: fixed;
             top: 15px;
@@ -53,26 +53,7 @@
             font-size: 1.3rem;
             cursor: pointer;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        } 
-
-        /* .mobile-menu-toggle {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 4000;
-            background: var(--member-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            width: 45px;
-            height: 45px;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            cursor: pointer;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        } */
+        }
 
         .dashboard-container {
             display: flex;
@@ -99,6 +80,11 @@
         
         .sidebar.collapsed {
             width: var(--sidebar-width-collapsed);
+        }
+        
+        /* MOBILE SIDEBAR STATE */
+        .sidebar.mobile-open {
+            transform: translateX(0) !important;
         }
         
         .logo-area {
@@ -874,7 +860,7 @@
         }
         
         /* Mobile Overlay */
-        /* .mobile-overlay {
+        .mobile-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -883,26 +869,11 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 2999;
-        }  */
-        .mobile-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 2500;
-    pointer-events: none; /* 🔥 KEY FIX */
-}
-
-.mobile-overlay.active {
-    display: block;
-    pointer-events: auto;
-}
-
-
+        }
         
-        /* .mobile-overlay.active {
+        .mobile-overlay.active {
             display: block;
-        } */
+        }
         
         /* Empty state */
         .empty-state {
@@ -2062,41 +2033,7 @@ function logout() {
 }
 
 /* ========== API HELPER (SINGLE SOURCE) ========== */
-// async function fetchWithAuth(endpoint, options = {}) {
-//     const token = localStorage.getItem('token');
-//     if (!token) {
-//         logout();
-//         return null;
-//     }
-
-//     try {
-//         const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-//             ...options,
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Authorization': `Bearer ${token}`,
-//                 ...(options.headers || {})
-//             }
-//         });
-
-//         if (res.status === 401) {
-//             showToast('Session expired. Login again.', 'error');
-//             logout();
-//             return null;
-//         }
-
-//         const data = await res.json();
-//         if (!res.ok) throw new Error(data.message || 'API Error');
-//         return data;
-
-//     } catch (err) {
-//         console.error('API error:', err);
-//         showToast(err.message || 'Network error', 'error');
-//         return null;
-//     }
-// }
-
-    async function fetchWithAuth(endpoint, options = {}) {
+async function fetchWithAuth(endpoint, options = {}) {
     const token = localStorage.getItem('token');
     if (!token) {
         console.warn('No token found');
@@ -2140,7 +2077,6 @@ function logout() {
         return null;
     }
 }
-
 
 /* ========== UI HELPERS ========== */
 function showToast(message, type = 'info') {
@@ -2189,44 +2125,44 @@ function toggleSidebar() {
     localStorage.setItem('sidebarCollapsed', isSidebarCollapsed);
 }
 
-// function setupMobileMenu() {
-//     const menuBtn = document.getElementById('mobileMenuToggle');
-//     const overlay = document.getElementById('mobileOverlay');
-//     const sidebar = document.getElementById('sidebar');
-
-//     menuBtn?.addEventListener('click', () => {
-//         sidebar.classList.toggle('mobile-open');
-//         overlay.classList.toggle('active');
-//     });
-
-//     overlay?.addEventListener('click', () => {
-//         sidebar.classList.remove('mobile-open');
-//         overlay.classList.remove('active');
-//     });
-// }
-    //
-   function setupMobileMenu() {
-    const btn = document.getElementById('mobileMenuToggle');
-    const sidebar = document.getElementById('sidebar');
+/* ========== FIXED MOBILE MENU TOGGLE ========== */
+function setupMobileMenu() {
+    const menuBtn = document.getElementById('mobileMenuToggle');
     const overlay = document.getElementById('mobileOverlay');
-
-    if (!btn || !sidebar || !overlay) return;
-
-    const toggle = () => {
+    const sidebar = document.getElementById('sidebar');
+    
+    if (!menuBtn || !overlay || !sidebar) return;
+    
+    const toggleMobileMenu = () => {
         sidebar.classList.toggle('mobile-open');
         overlay.classList.toggle('active');
     };
-
-    btn.addEventListener('click', toggle);
-    btn.addEventListener('touchstart', e => {
-        e.preventDefault();
-        toggle();
-    }, { passive: false });
-
-    overlay.addEventListener('click', toggle);
+    
+    // Toggle menu when button is clicked
+    menuBtn.addEventListener('click', toggleMobileMenu);
+    
+    // Close menu when overlay is clicked
+    overlay.addEventListener('click', toggleMobileMenu);
+    
+    // Close menu when clicking on menu links (on mobile)
+    const menuLinks = document.querySelectorAll('.menu a');
+    menuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 767) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            }
+        });
+    });
+    
+    // Close menu when resizing to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 767) {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        }
+    });
 }
-
-//
 
 /* ========== NAVIGATION (FIXED) ========== */
 function setupNavigation() {
@@ -2333,9 +2269,6 @@ async function loadDashboardStats() {
         data.activeAdmins || 0;
 }
 
-/* ======================================================
-   DONATIONS
-   ====================================================== */
 /* ======================================================
    DONATIONS
    ====================================================== */
@@ -2504,7 +2437,6 @@ async function rejectDonation(id) {
     showToast('Donation rejected', 'info');
     loadDonations();
 }
-
 
 /* ======================================================
    EXPENSES
@@ -2738,7 +2670,6 @@ async function loadBudgetCategories() {
     }
 }
 
-
 /* ======================================================
    PART 3 — ADMIN / EXCEL / REPORTS / INIT (FINAL)
    ====================================================== */
@@ -2934,57 +2865,6 @@ async function loadReports() {
 }
 
 //members 
-
-//const API_BASE_URL = 'http://localhost:3000/api';
-
-// async function loadMembers() {
-//   try {
-//     const res = await fetch(`${API_BASE_URL}/admins/members`);
-//     const data = await res.json();
-
-//     const members = data.members;
-
-//     const tbody = document.getElementById("memberTableBody"); // ✅ FIXED
-//     tbody.innerHTML = "";
-
-//     if (!members || members.length === 0) {
-//       tbody.innerHTML = `
-//         <tr>
-//           <td colspan="5" style="text-align:center;">No members found</td>
-//         </tr>
-//       `;
-//       return;
-//     }
-
-//     // members.forEach(m => {
-//     //   tbody.innerHTML += `
-//     //     <tr>
-//     //       <td>${m.idCardNo}</td>
-//     //       <td>${m.name}</td>
-//     //       <td>${m.mobile}</td>
-//     //       <td>Active</td>
-//     //       <td>${new Date(m.createdAt).toLocaleDateString()}</td>
-//     //     </tr>
-//     //   `;
-//     // });
-//     members.forEach(m => {
-//   tbody.innerHTML += `
-//     <tr>
-//       <td>${m.idCardNo}</td>
-//       <td>${m.name}</td>
-//       <td>${m.mobile}</td>
-//       <td>Active</td>
-//       <td>${new Date(m.createdAt).toLocaleDateString()}</td>
-//       <td>
-//         <button class="action-btn delete-btn"
-//           onclick="deleteMember('${m._id}')">
-//           <i class="fas fa-trash"></i>
-//         </button>
-//       </td>
-//     </tr>
-//   `;
-// });
-    
 async function loadMembers() {
     try {
         showLoading();
@@ -3036,42 +2916,7 @@ async function loadMembers() {
     }
 }
 
-
-//document.addEventListener('DOMContentLoaded', loadMembers);
-
-//delete member
-// async function deleteMember(memberId) {
-//   if (!confirm('Are you sure you want to delete this member?')) return;
-
-//   try {
-//     const token = localStorage.getItem('token'); // adjust if stored elsewhere
-
-//     const res = await fetch(
-//       `${API_BASE_URL}/admins/members/${memberId}`,
-//       {
-//         method: 'DELETE',
-//         headers: {
-//           'Authorization': `Bearer ${token}`
-//         }
-//       }
-//     );
-
-//     const data = await res.json();
-
-//     if (!res.ok) {
-//       throw new Error(data.message || 'Delete failed');
-//     }
-
-//     alert('Member deleted successfully');
-//     loadMembers(); // 🔁 refresh table
-
-//   } catch (err) {
-//     console.error('DELETE MEMBER FAILED:', err);
-//     alert('Failed to delete member');
-//   }
-// }
-
-    async function deleteMember(memberId) {
+async function deleteMember(memberId) {
     if (!confirm('Are you sure you want to delete this member?')) return;
 
     const res = await fetchWithAuth(`/admins/members/${memberId}`, {
@@ -3083,8 +2928,6 @@ async function loadMembers() {
     showToast('Member deleted successfully', 'success');
     loadMembers();
 }
-
-
 
 /* ===============================
    BUTTON BINDING (SAFE)
@@ -3395,38 +3238,6 @@ function enableEnterSearch(inputId, searchFn) {
         }
     });
 }
-    //
-    console.log('SCRIPT LOADED');
-
-window.addEventListener('load', () => {
-    const btn = document.getElementById('mobileMenuToggle');
-    const sidebar = document.getElementById('sidebar');
-
-    if (!btn || !sidebar) {
-        alert('❌ mobileMenuToggle or sidebar not found');
-        return;
-    }
-
-    alert('✅ Mobile menu button found');
-
-    btn.onclick = () => {
-        alert('☰ CLICK WORKED');
-        sidebar.classList.toggle('mobile-open');
-    };
-});
-
-
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
