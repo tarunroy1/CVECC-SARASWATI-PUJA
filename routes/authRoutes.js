@@ -84,7 +84,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
-const Admin = require('../models/Admin'); // ✅ IMPORTANT
+const Admin = require('../models/admin'); // ✅ IMPORTANT
 const Member = require('../models/member');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'club_secret_key';
@@ -190,3 +190,4 @@ router.post('/login', async (req, res) => {
 
 
 module.exports = router;
+
