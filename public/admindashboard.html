@@ -36,7 +36,7 @@
         }
         
         /* /* Mobile Menu Toggle */
-        /* .mobile-menu-toggle {
+         .mobile-menu-toggle {
             display: none;
             position: fixed;
             top: 15px;
@@ -53,9 +53,9 @@
             font-size: 1.3rem;
             cursor: pointer;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        } */ */
+        } 
 
-        .mobile-menu-toggle {
+        /* .mobile-menu-toggle {
             display: none;
             position: fixed;
             top: 15px;
@@ -72,7 +72,7 @@
             font-size: 1.3rem;
             cursor: pointer;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        }
+        } */
 
         .dashboard-container {
             display: flex;
@@ -874,7 +874,7 @@
         }
         
         /* Mobile Overlay */
-        /* .mobile-overlay {
+        .mobile-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -883,8 +883,8 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 2999;
-        } */
-        .mobile-overlay {
+        } 
+        /* .mobile-overlay {
     display: none;
     position: fixed;
     top: 0;
@@ -893,7 +893,7 @@
     height: 100%;
     background: rgba(0,0,0,0.5);
     z-index: 3000;
-}
+} */
 
         
         .mobile-overlay.active {
@@ -2185,21 +2185,52 @@ function toggleSidebar() {
     localStorage.setItem('sidebarCollapsed', isSidebarCollapsed);
 }
 
-function setupMobileMenu() {
+// function setupMobileMenu() {
+//     const menuBtn = document.getElementById('mobileMenuToggle');
+//     const overlay = document.getElementById('mobileOverlay');
+//     const sidebar = document.getElementById('sidebar');
+
+//     menuBtn?.addEventListener('click', () => {
+//         sidebar.classList.toggle('mobile-open');
+//         overlay.classList.toggle('active');
+//     });
+
+//     overlay?.addEventListener('click', () => {
+//         sidebar.classList.remove('mobile-open');
+//         overlay.classList.remove('active');
+//     });
+// }
+    //
+    function setupMobileMenu() {
     const menuBtn = document.getElementById('mobileMenuToggle');
     const overlay = document.getElementById('mobileOverlay');
     const sidebar = document.getElementById('sidebar');
 
-    menuBtn?.addEventListener('click', () => {
+    if (!menuBtn || !overlay || !sidebar) return;
+
+    // REMOVE old listeners first
+    menuBtn.onclick = null;
+    overlay.onclick = null;
+
+    // TOUCH + CLICK support
+    const toggleMenu = () => {
         sidebar.classList.toggle('mobile-open');
         overlay.classList.toggle('active');
-    });
+    };
 
-    overlay?.addEventListener('click', () => {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
-    });
+    menuBtn.addEventListener('click', toggleMenu);
+    menuBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        toggleMenu();
+    }, { passive: false });
+
+    overlay.addEventListener('click', toggleMenu);
+    overlay.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        toggleMenu();
+    }, { passive: false });
 }
+//
 
 /* ========== NAVIGATION (FIXED) ========== */
 function setupNavigation() {
@@ -3372,6 +3403,7 @@ function enableEnterSearch(inputId, searchFn) {
 </script>
 </body>
 </html>
+
 
 
 
