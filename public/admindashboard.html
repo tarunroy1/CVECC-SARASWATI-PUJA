@@ -2107,7 +2107,22 @@ function setupResponsive() {
     }
 }
 
-function toggleSidebar() {
+// function toggleSidebar() {
+//     const sidebar = document.getElementById('sidebar');
+//     const toggle = document.getElementById('sidebarToggle');
+
+//     isSidebarCollapsed = !isSidebarCollapsed;
+//     sidebar.classList.toggle('collapsed', isSidebarCollapsed);
+//     toggle.innerHTML = isSidebarCollapsed
+//         ? '<i class="fas fa-chevron-right"></i>'
+//         : '<i class="fas fa-chevron-left"></i>';
+
+//     localStorage.setItem('sidebarCollapsed', isSidebarCollapsed);
+// }
+
+    function toggleSidebar() {
+    if (window.innerWidth <= 767) return; // 🚫 block on mobile
+
     const sidebar = document.getElementById('sidebar');
     const toggle = document.getElementById('sidebarToggle');
 
@@ -2126,16 +2141,37 @@ function setupMobileMenu() {
     const overlay = document.getElementById('mobileOverlay');
     const sidebar = document.getElementById('sidebar');
 
-    menuBtn?.addEventListener('click', () => {
+    if (!menuBtn || !overlay || !sidebar) return;
+
+    menuBtn.addEventListener('click', () => {
         sidebar.classList.toggle('mobile-open');
         overlay.classList.toggle('active');
     });
 
-    overlay?.addEventListener('click', () => {
+    overlay.addEventListener('click', () => {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
     });
+
+    // Close sidebar when menu item clicked (mobile)
+    document.querySelectorAll('.menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 767) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            }
+        });
+    });
+
+    // Reset when switching to desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 767) {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        }
+    });
 }
+
 
 /* ========== NAVIGATION (FIXED) ========== */
 function setupNavigation() {
@@ -2215,7 +2251,20 @@ async function loadRecentActivities() {
 }
 
 /* ========== INITIAL BASE INIT ========== */
-document.addEventListener('DOMContentLoaded', () => {
+// document.addEventListener('DOMContentLoaded', () => {
+//     if (!checkLoginStatus()) return;
+
+//     setupResponsive();
+//     setupMobileMenu();
+//     setupNavigation();
+//     setupButtonListeners();
+//     setupSearchEnterKey();
+
+//     // Default dashboard load
+//     loadDashboardStats();
+//     loadRecentActivities();
+// });
+    document.addEventListener('DOMContentLoaded', () => {
     if (!checkLoginStatus()) return;
 
     setupResponsive();
@@ -2224,10 +2273,17 @@ document.addEventListener('DOMContentLoaded', () => {
     setupButtonListeners();
     setupSearchEnterKey();
 
-    // Default dashboard load
+    // 🔥 CRITICAL FIX — disable collapse on mobile
+    if (window.innerWidth <= 767) {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.remove('collapsed');
+        isSidebarCollapsed = false;
+    }
+
     loadDashboardStats();
     loadRecentActivities();
 });
+
 
 /* ======================================================
    PART 2 — DONATIONS / EXPENSES / BUDGET (FIXED)
@@ -2966,17 +3022,17 @@ function setupSearchEnterKey() {
 /* ===============================
    FINAL INIT
 =============================== */
-document.addEventListener('DOMContentLoaded', () => {
-    if (!checkLoginStatus()) return;
+// document.addEventListener('DOMContentLoaded', () => {
+//     if (!checkLoginStatus()) return;
 
-    setupResponsive();
-    setupMobileMenu();
-    setupNavigation();
-    setupButtonListeners();
+//     setupResponsive();
+//     setupMobileMenu();
+//     setupNavigation();
+//     setupButtonListeners();
 
-    loadDashboardStats();
-    loadRecentActivities();
-});
+//     loadDashboardStats();
+//     loadRecentActivities();
+// });
 
 //excel export 
 function exportReport() {
@@ -3210,3 +3266,4 @@ window.addEventListener('resize', setupResponsive);
 </script>
 </body>
 </html>
+
