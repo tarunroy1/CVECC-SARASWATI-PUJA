@@ -114,7 +114,7 @@
 
 const express = require('express');
 const router = express.Router();
-const Donation = require('../models/Donation');
+const Donation = require('../models/Donations');
 const Activity = require('../models/activity');
 const { verifyToken, allowRoles } = require('../middleware/auth');
 
@@ -331,4 +331,5 @@ router.get('/:id', verifyToken, async (req, res) => {
 });
 
 module.exports = router;
+
 
