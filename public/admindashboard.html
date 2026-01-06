@@ -82,17 +82,9 @@
             width: var(--sidebar-width-collapsed);
         }
         
-        /* MOBILE SIDEBAR STATE - FIXED */
-        @media (max-width: 767px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-                z-index: 3000;
-            }
-            
-            .sidebar.open {
-                transform: translateX(0) !important;
-            }
+        /* MOBILE SIDEBAR STATE */
+        .sidebar.mobile-open {
+            transform: translateX(0) !important;
         }
         
         .logo-area {
@@ -936,17 +928,61 @@
         }
         
         /* Mobile devices */
-        @media (max-width: 767px) {
+        /* @media (max-width: 767px) {
             .mobile-menu-toggle {
                 display: flex;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                z-index: 3000;
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
             }
             
             .main-content {
                 margin-left: 0 !important;
                 padding: 15px;
                 padding-top: 70px;
-            }
-            
+            } */
+            /* MOBILE SIDEBAR FIX */
+@media (max-width: 767px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 3000;
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .mobile-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 2999;
+        display: none;
+    }
+
+    .mobile-overlay.active {
+        display: block;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding-top: 70px;
+    }
+}
+
             .header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -1669,7 +1705,7 @@
                                     </div>
                                 </div>
                                 
-                                .form-group {
+                                <div class="form-group">
                                     <label for="budgetDescription">Description (Optional)</label>
                                     <textarea id="budgetDescription" rows="3"></textarea>
                                 </div>
@@ -2124,50 +2160,81 @@ function toggleSidebar() {
 }
 
 /* ========== FIXED MOBILE MENU TOGGLE ========== */
-function setupMobileMenu() {
+// function setupMobileMenu() {
+//     const menuBtn = document.getElementById('mobileMenuToggle');
+//     const overlay = document.getElementById('mobileOverlay');
+//     const sidebar = document.getElementById('sidebar');
+    
+//     if (!menuBtn || !overlay || !sidebar) return;
+    
+//     const toggleMobileMenu = () => {
+//         sidebar.classList.toggle('mobile-open');
+//         overlay.classList.toggle('active');
+//     };
+    
+//     // Toggle menu when button is clicked
+//     menuBtn.addEventListener('click', toggleMobileMenu);
+    
+//     // Close menu when overlay is clicked
+//     overlay.addEventListener('click', toggleMobileMenu);
+    
+//     // Close menu when clicking on menu links (on mobile)
+//     const menuLinks = document.querySelectorAll('.menu a');
+//     menuLinks.forEach(link => {
+//         link.addEventListener('click', () => {
+//             if (window.innerWidth <= 767) {
+//                 sidebar.classList.remove('mobile-open');
+//                 overlay.classList.remove('active');
+//             }
+//         });
+//     });
+    function setupMobileMenu() {
     const menuBtn = document.getElementById('mobileMenuToggle');
-    const overlay = document.getElementById('mobileOverlay');
     const sidebar = document.getElementById('sidebar');
-    
-    if (!menuBtn || !overlay || !sidebar) {
-        console.error('Mobile menu elements not found');
-        return;
+    const overlay = document.getElementById('mobileOverlay');
+
+    if (!menuBtn || !sidebar || !overlay) return;
+
+    function openMenu() {
+        sidebar.classList.add('mobile-open');
+        overlay.classList.add('active');
     }
-    
-    const toggleMobileMenu = () => {
-        console.log('Mobile menu toggle clicked');
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-    };
-    
-    // Toggle menu when button is clicked
-    menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMobileMenu();
-    });
-    
-    // Close menu when overlay is clicked
-    overlay.addEventListener('click', (e) => {
-        e.stopPropagation();
-        sidebar.classList.remove('open');
+
+    function closeMenu() {
+        sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
-    });
-    
-    // Close menu when clicking on menu links (on mobile)
-    const menuLinks = document.querySelectorAll('.menu a');
-    menuLinks.forEach(link => {
-        link.addEventListener('click', () => {
+    }
+
+    menuBtn.onclick = () => {
+        sidebar.classList.contains('mobile-open')
+            ? closeMenu()
+            : openMenu();
+    };
+
+    overlay.onclick = closeMenu;
+
+    // Close menu when any menu item clicked
+    document.querySelectorAll('.menu a').forEach(link => {
+        link.onclick = () => {
             if (window.innerWidth <= 767) {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
+                closeMenu();
             }
-        });
+        };
     });
+
+    // Auto-close when screen becomes desktop
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 767) {
+            closeMenu();
+        }
+    });
+}
+
     
     // Close menu when resizing to desktop
     window.addEventListener('resize', () => {
         if (window.innerWidth > 767) {
-            sidebar.classList.remove('open');
+            sidebar.classList.remove('mobile-open');
             overlay.classList.remove('active');
         }
     });
@@ -3001,7 +3068,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMobileMenu();
     setupNavigation();
     setupButtonListeners();
-
+    // Prevent sidebar collapse logic on mobile
+if (window.innerWidth <= 767) {
+    document.getElementById('sidebar').classList.remove('collapsed');
+}
     loadDashboardStats();
     loadRecentActivities();
 });
