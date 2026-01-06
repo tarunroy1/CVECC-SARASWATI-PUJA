@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 
-const SECRET = 'club_secret_key';
+// const SECRET = 'club_secret_key';
+const SECRET = process.env.JWT_SECRET || 'club_secret_key';
+
 
 exports.verifyToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -28,3 +30,4 @@ exports.allowRoles = (...roles) => {
         next();
     };
 };
+
