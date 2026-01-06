@@ -2834,53 +2834,98 @@ async function loadReports() {
 
 //const API_BASE_URL = 'http://localhost:3000/api';
 
-async function loadMembers() {
-  try {
-    const res = await fetch(`${API_BASE_URL}/admins/members`);
-    const data = await res.json();
+// async function loadMembers() {
+//   try {
+//     const res = await fetch(`${API_BASE_URL}/admins/members`);
+//     const data = await res.json();
 
-    const members = data.members;
+//     const members = data.members;
 
-    const tbody = document.getElementById("memberTableBody"); // ✅ FIXED
-    tbody.innerHTML = "";
+//     const tbody = document.getElementById("memberTableBody"); // ✅ FIXED
+//     tbody.innerHTML = "";
 
-    if (!members || members.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="5" style="text-align:center;">No members found</td>
-        </tr>
-      `;
-      return;
+//     if (!members || members.length === 0) {
+//       tbody.innerHTML = `
+//         <tr>
+//           <td colspan="5" style="text-align:center;">No members found</td>
+//         </tr>
+//       `;
+//       return;
+//     }
+
+//     // members.forEach(m => {
+//     //   tbody.innerHTML += `
+//     //     <tr>
+//     //       <td>${m.idCardNo}</td>
+//     //       <td>${m.name}</td>
+//     //       <td>${m.mobile}</td>
+//     //       <td>Active</td>
+//     //       <td>${new Date(m.createdAt).toLocaleDateString()}</td>
+//     //     </tr>
+//     //   `;
+//     // });
+//     members.forEach(m => {
+//   tbody.innerHTML += `
+//     <tr>
+//       <td>${m.idCardNo}</td>
+//       <td>${m.name}</td>
+//       <td>${m.mobile}</td>
+//       <td>Active</td>
+//       <td>${new Date(m.createdAt).toLocaleDateString()}</td>
+//       <td>
+//         <button class="action-btn delete-btn"
+//           onclick="deleteMember('${m._id}')">
+//           <i class="fas fa-trash"></i>
+//         </button>
+//       </td>
+//     </tr>
+//   `;
+// });
+    async function loadMembers() {
+    showLoading();
+
+    const data = await fetchWithAuth('/admins/members');
+    hideLoading();
+
+    if (!data || !data.members) return;
+
+    // 🔥 store for search
+    window.membersData = data.members;
+
+    const tbody = document.getElementById('memberTableBody');
+    tbody.innerHTML = '';
+
+    if (data.members.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;">
+                    No members found
+                </td>
+            </tr>`;
+        return;
     }
 
-    // members.forEach(m => {
-    //   tbody.innerHTML += `
-    //     <tr>
-    //       <td>${m.idCardNo}</td>
-    //       <td>${m.name}</td>
-    //       <td>${m.mobile}</td>
-    //       <td>Active</td>
-    //       <td>${new Date(m.createdAt).toLocaleDateString()}</td>
-    //     </tr>
-    //   `;
-    // });
-    members.forEach(m => {
-  tbody.innerHTML += `
-    <tr>
-      <td>${m.idCardNo}</td>
-      <td>${m.name}</td>
-      <td>${m.mobile}</td>
-      <td>Active</td>
-      <td>${new Date(m.createdAt).toLocaleDateString()}</td>
-      <td>
-        <button class="action-btn delete-btn"
-          onclick="deleteMember('${m._id}')">
-          <i class="fas fa-trash"></i>
-        </button>
-      </td>
-    </tr>
-  `;
-});
+    data.members.forEach(m => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${m.idCardNo}</td>
+                <td>${m.name}</td>
+                <td>${m.mobile}</td>
+                <td>
+                    <span class="badge badge-success">ACTIVE</span>
+                </td>
+                <td>${formatDate(m.createdAt)}</td>
+                <td>
+                    <button class="action-btn delete-btn"
+                        onclick="deleteMember('${m._id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
 
   } catch (err) {
     console.error('❌ Failed to load members:', err);
@@ -2888,39 +2933,53 @@ async function loadMembers() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadMembers);
+//document.addEventListener('DOMContentLoaded', loadMembers);
 
 //delete member
-async function deleteMember(memberId) {
-  if (!confirm('Are you sure you want to delete this member?')) return;
+// async function deleteMember(memberId) {
+//   if (!confirm('Are you sure you want to delete this member?')) return;
 
-  try {
-    const token = localStorage.getItem('token'); // adjust if stored elsewhere
+//   try {
+//     const token = localStorage.getItem('token'); // adjust if stored elsewhere
 
-    const res = await fetch(
-      `${API_BASE_URL}/admins/members/${memberId}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+//     const res = await fetch(
+//       `${API_BASE_URL}/admins/members/${memberId}`,
+//       {
+//         method: 'DELETE',
+//         headers: {
+//           'Authorization': `Bearer ${token}`
+//         }
+//       }
+//     );
 
-    const data = await res.json();
+//     const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.message || 'Delete failed');
-    }
+//     if (!res.ok) {
+//       throw new Error(data.message || 'Delete failed');
+//     }
 
-    alert('Member deleted successfully');
-    loadMembers(); // 🔁 refresh table
+//     alert('Member deleted successfully');
+//     loadMembers(); // 🔁 refresh table
 
-  } catch (err) {
-    console.error('DELETE MEMBER FAILED:', err);
-    alert('Failed to delete member');
-  }
+//   } catch (err) {
+//     console.error('DELETE MEMBER FAILED:', err);
+//     alert('Failed to delete member');
+//   }
+// }
+
+    async function deleteMember(memberId) {
+    if (!confirm('Are you sure you want to delete this member?')) return;
+
+    const res = await fetchWithAuth(`/admins/members/${memberId}`, {
+        method: 'DELETE'
+    });
+
+    if (!res) return;
+
+    showToast('Member deleted successfully', 'success');
+    loadMembers();
 }
+
 
 
 /* ===============================
@@ -3236,5 +3295,6 @@ function enableEnterSearch(inputId, searchFn) {
 </script>
 </body>
 </html>
+
 
 
