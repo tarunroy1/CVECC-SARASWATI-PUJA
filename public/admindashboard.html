@@ -2881,59 +2881,60 @@ async function loadReports() {
 //     </tr>
 //   `;
 // });
-    async function loadMembers() {
-    showLoading();
+    
+async function loadMembers() {
+    try {
+        showLoading();
 
-    const data = await fetchWithAuth('/admins/members');
-    hideLoading();
+        const data = await fetchWithAuth('/admins/members');
+        hideLoading();
 
-    if (!data || !data.members) return;
+        if (!data || !data.members) return;
 
-    // 🔥 store for search
-    window.membersData = data.members;
+        window.membersData = data.members;
 
-    const tbody = document.getElementById('memberTableBody');
-    tbody.innerHTML = '';
+        const tbody = document.getElementById('memberTableBody');
+        tbody.innerHTML = '';
 
-    if (data.members.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align:center;">
-                    No members found
-                </td>
-            </tr>`;
-        return;
+        if (data.members.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center;">
+                        No members found
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        data.members.forEach(m => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${m.idCardNo}</td>
+                    <td>${m.name}</td>
+                    <td>${m.mobile}</td>
+                    <td>
+                        <span class="badge badge-success">ACTIVE</span>
+                    </td>
+                    <td>${formatDate(m.createdAt)}</td>
+                    <td>
+                        <button class="action-btn delete-btn"
+                            onclick="deleteMember('${m._id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+    } catch (err) {
+        hideLoading();
+        console.error('❌ Failed to load members:', err);
+        showToast('Failed to load members', 'error');
     }
-
-    data.members.forEach(m => {
-        tbody.innerHTML += `
-            <tr>
-                <td>${m.idCardNo}</td>
-                <td>${m.name}</td>
-                <td>${m.mobile}</td>
-                <td>
-                    <span class="badge badge-success">ACTIVE</span>
-                </td>
-                <td>${formatDate(m.createdAt)}</td>
-                <td>
-                    <button class="action-btn delete-btn"
-                        onclick="deleteMember('${m._id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
 }
 
 
-  } catch (err) {
-    console.error('❌ Failed to load members:', err);
-    alert('Failed to load members');
-  }
-}
-
-document.addEventListener('DOMContentLoaded', loadMembers);
+//document.addEventListener('DOMContentLoaded', loadMembers);
 
 //delete member
 // async function deleteMember(memberId) {
@@ -3295,6 +3296,7 @@ function enableEnterSearch(inputId, searchFn) {
 </script>
 </body>
 </html>
+
 
 
 
