@@ -2028,10 +2028,44 @@ function logout() {
 }
 
 /* ========== API HELPER (SINGLE SOURCE) ========== */
-async function fetchWithAuth(endpoint, options = {}) {
+// async function fetchWithAuth(endpoint, options = {}) {
+//     const token = localStorage.getItem('token');
+//     if (!token) {
+//         logout();
+//         return null;
+//     }
+
+//     try {
+//         const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+//             ...options,
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${token}`,
+//                 ...(options.headers || {})
+//             }
+//         });
+
+//         if (res.status === 401) {
+//             showToast('Session expired. Login again.', 'error');
+//             logout();
+//             return null;
+//         }
+
+//         const data = await res.json();
+//         if (!res.ok) throw new Error(data.message || 'API Error');
+//         return data;
+
+//     } catch (err) {
+//         console.error('API error:', err);
+//         showToast(err.message || 'Network error', 'error');
+//         return null;
+//     }
+// }
+
+    async function fetchWithAuth(endpoint, options = {}) {
     const token = localStorage.getItem('token');
     if (!token) {
-        logout();
+        console.warn('No token found');
         return null;
     }
 
@@ -2045,22 +2079,34 @@ async function fetchWithAuth(endpoint, options = {}) {
             }
         });
 
+        const text = await res.text(); // ✅ SAFE READ
+
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch {
+            console.error('❌ Server returned HTML instead of JSON:', text);
+            return null;
+        }
+
         if (res.status === 401) {
-            showToast('Session expired. Login again.', 'error');
+            alert('Session expired. Please login again.');
             logout();
             return null;
         }
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'API Error');
+        if (!res.ok) {
+            throw new Error(data.message || 'API Error');
+        }
+
         return data;
 
     } catch (err) {
         console.error('API error:', err);
-        showToast(err.message || 'Network error', 'error');
         return null;
     }
 }
+
 
 /* ========== UI HELPERS ========== */
 function showToast(message, type = 'info') {
@@ -3296,6 +3342,7 @@ function enableEnterSearch(inputId, searchFn) {
 </script>
 </body>
 </html>
+
 
 
 
