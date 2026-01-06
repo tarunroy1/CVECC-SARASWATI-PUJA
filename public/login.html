@@ -440,7 +440,8 @@
     </div>
 
     <script>
-       const API_BASE_URL = 'https://cvecc-saraswati-puja.onrender.com/api';
+       // const API_BASE_URL = 'https://cvecc-saraswati-puja.onrender.com/api';
+        const API_BASE_URL = '/api';
         const loginButton = document.getElementById('loginButton');
         const signupButton = document.getElementById('signupButton');
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -463,9 +464,9 @@
                 const isLoggedIn = localStorage.getItem('isLoggedIn');
                 if (isLoggedIn === 'true' && user && user.role && user.idCardNo) {
                     if (user.role === 'superadmin' || user.role === 'admin') {
-                        window.location.href = 'admindashboard.html';
+                        window.location.href = '/admindashboard.html';
                     } else {
-                        window.location.href = 'members.html';
+                        window.location.href = '/members.html';
                     }
                 }
             } catch {
@@ -494,49 +495,91 @@
             const originalHTML = loginButton.innerHTML;
             loginButton.innerHTML = '<div class="loading"></div> Logging in...';
 
+            // try {
+            //     const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            //         method: 'POST',
+            //         headers: { 'Content-Type': 'application/json' },
+            //         body: JSON.stringify({ idCardNo, mobile })
+            //     });
+
+            //     const data = await response.json();
+
+            //     if (!response.ok || !data.token || !data.user || !data.user.idCardNo) {
+            //         throw new Error(data.message || 'Login failed');
+            //     }
+
+            //     // Save session data
+            //     localStorage.setItem('token', data.token);
+            //     localStorage.setItem('user', JSON.stringify(data.user));
+            //     localStorage.setItem('isLoggedIn', 'true');
+            //     localStorage.setItem('loginTime', new Date().toISOString());
+
+            //     // Redirect by role
+            //     if (data.user.role === 'superadmin' || data.user.role === 'admin') {
+            //         window.location.href = 'admindashboard.html';
+            //     } else {
+            //         window.location.href = 'members.html';
+            //     }
+
+            // } catch (error) {
+            //     console.error('Login error:', error);
+
+            //     if (error.message.includes('Invalid') || error.message.includes('not found')) {
+            //         const goSignup = confirm(
+            //             'No account found with this ID Card and Mobile number.\n\nCreate a new member account?'
+            //         );
+            //         if (goSignup) {
+            //             window.location.href = 'signup.html';
+            //             return;
+            //         }
+            //     } else {
+            //         alert(error.message || 'Network error');
+            //     }
+
+            //     loginButton.disabled = false;
+            //     loginButton.innerHTML = originalHTML;
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idCardNo, mobile })
-                });
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idCardNo, mobile })
+    });
 
-                const data = await response.json();
+    // 🔒 SAFETY: read text first
+    const text = await response.text();
 
-                if (!response.ok || !data.token || !data.user || !data.user.idCardNo) {
-                    throw new Error(data.message || 'Login failed');
-                }
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch {
+        throw new Error('Server returned invalid response. Please try again.');
+    }
 
-                // Save session data
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('loginTime', new Date().toISOString());
+    if (!response.ok || !data.token || !data.user) {
+        throw new Error(data.message || 'Login failed');
+    }
 
-                // Redirect by role
-                if (data.user.role === 'superadmin' || data.user.role === 'admin') {
-                    window.location.href = 'admindashboard.html';
-                } else {
-                    window.location.href = 'members.html';
-                }
+    // Save session
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('loginTime', new Date().toISOString());
 
-            } catch (error) {
-                console.error('Login error:', error);
+    // Redirect by role
+    if (data.user.role === 'superadmin' || data.user.role === 'admin') {
+        window.location.href = '/admindashboard.html';
+    } else {
+        window.location.href = '/members.html';
+    }
 
-                if (error.message.includes('Invalid') || error.message.includes('not found')) {
-                    const goSignup = confirm(
-                        'No account found with this ID Card and Mobile number.\n\nCreate a new member account?'
-                    );
-                    if (goSignup) {
-                        window.location.href = 'signup.html';
-                        return;
-                    }
-                } else {
-                    alert(error.message || 'Network error');
-                }
+} catch (error) {
+    console.error('Login error:', error);
+    alert(error.message || 'Login failed');
 
-                loginButton.disabled = false;
-                loginButton.innerHTML = originalHTML;
+    loginButton.disabled = false;
+    loginButton.innerHTML = originalHTML;
+}
+
             } finally {
                 loadingOverlay.classList.remove('active');
             }
@@ -572,4 +615,5 @@
 </body>
 
 </html>
+
 
