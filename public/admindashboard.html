@@ -874,7 +874,7 @@
         }
         
         /* Mobile Overlay */
-        .mobile-overlay {
+        /* .mobile-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -883,22 +883,26 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 2999;
-        } 
-        /* .mobile-overlay {
+        }  */
+        .mobile-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: rgba(0,0,0,0.5);
-    z-index: 3000;
-} */
+    z-index: 2500;
+    pointer-events: none; /* 🔥 KEY FIX */
+}
+
+.mobile-overlay.active {
+    display: block;
+    pointer-events: auto;
+}
+
 
         
-        .mobile-overlay.active {
+        /* .mobile-overlay.active {
             display: block;
-        }
+        } */
         
         /* Empty state */
         .empty-state {
@@ -2201,35 +2205,27 @@ function toggleSidebar() {
 //     });
 // }
     //
-    function setupMobileMenu() {
-    const menuBtn = document.getElementById('mobileMenuToggle');
-    const overlay = document.getElementById('mobileOverlay');
+   function setupMobileMenu() {
+    const btn = document.getElementById('mobileMenuToggle');
     const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobileOverlay');
 
-    if (!menuBtn || !overlay || !sidebar) return;
+    if (!btn || !sidebar || !overlay) return;
 
-    // REMOVE old listeners first
-    menuBtn.onclick = null;
-    overlay.onclick = null;
-
-    // TOUCH + CLICK support
-    const toggleMenu = () => {
+    const toggle = () => {
         sidebar.classList.toggle('mobile-open');
         overlay.classList.toggle('active');
     };
 
-    menuBtn.addEventListener('click', toggleMenu);
-    menuBtn.addEventListener('touchstart', (e) => {
+    btn.addEventListener('click', toggle);
+    btn.addEventListener('touchstart', e => {
         e.preventDefault();
-        toggleMenu();
+        toggle();
     }, { passive: false });
 
-    overlay.addEventListener('click', toggleMenu);
-    overlay.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        toggleMenu();
-    }, { passive: false });
+    overlay.addEventListener('click', toggle);
 }
+
 //
 
 /* ========== NAVIGATION (FIXED) ========== */
@@ -3399,10 +3395,31 @@ function enableEnterSearch(inputId, searchFn) {
         }
     });
 }
+    //
+    console.log('SCRIPT LOADED');
+
+window.addEventListener('load', () => {
+    const btn = document.getElementById('mobileMenuToggle');
+    const sidebar = document.getElementById('sidebar');
+
+    if (!btn || !sidebar) {
+        alert('❌ mobileMenuToggle or sidebar not found');
+        return;
+    }
+
+    alert('✅ Mobile menu button found');
+
+    btn.onclick = () => {
+        alert('☰ CLICK WORKED');
+        sidebar.classList.toggle('mobile-open');
+    };
+});
+
 
 </script>
 </body>
 </html>
+
 
 
 
