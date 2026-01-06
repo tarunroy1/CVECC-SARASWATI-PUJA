@@ -82,9 +82,17 @@
             width: var(--sidebar-width-collapsed);
         }
         
-        /* MOBILE SIDEBAR STATE */
-        .sidebar.mobile-open {
-            transform: translateX(0) !important;
+        /* MOBILE SIDEBAR STATE - FIXED */
+        @media (max-width: 767px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                z-index: 3000;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0) !important;
+            }
         }
         
         .logo-area {
@@ -933,16 +941,6 @@
                 display: flex;
             }
             
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-                z-index: 3000;
-            }
-            
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            
             .main-content {
                 margin-left: 0 !important;
                 padding: 15px;
@@ -1671,7 +1669,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="form-group">
+                                .form-group {
                                     <label for="budgetDescription">Description (Optional)</label>
                                     <textarea id="budgetDescription" rows="3"></textarea>
                                 </div>
@@ -2131,25 +2129,36 @@ function setupMobileMenu() {
     const overlay = document.getElementById('mobileOverlay');
     const sidebar = document.getElementById('sidebar');
     
-    if (!menuBtn || !overlay || !sidebar) return;
+    if (!menuBtn || !overlay || !sidebar) {
+        console.error('Mobile menu elements not found');
+        return;
+    }
     
     const toggleMobileMenu = () => {
-        sidebar.classList.toggle('mobile-open');
+        console.log('Mobile menu toggle clicked');
+        sidebar.classList.toggle('open');
         overlay.classList.toggle('active');
     };
     
     // Toggle menu when button is clicked
-    menuBtn.addEventListener('click', toggleMobileMenu);
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMobileMenu();
+    });
     
     // Close menu when overlay is clicked
-    overlay.addEventListener('click', toggleMobileMenu);
+    overlay.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+    });
     
     // Close menu when clicking on menu links (on mobile)
     const menuLinks = document.querySelectorAll('.menu a');
     menuLinks.forEach(link => {
         link.addEventListener('click', () => {
             if (window.innerWidth <= 767) {
-                sidebar.classList.remove('mobile-open');
+                sidebar.classList.remove('open');
                 overlay.classList.remove('active');
             }
         });
@@ -2158,7 +2167,7 @@ function setupMobileMenu() {
     // Close menu when resizing to desktop
     window.addEventListener('resize', () => {
         if (window.innerWidth > 767) {
-            sidebar.classList.remove('mobile-open');
+            sidebar.classList.remove('open');
             overlay.classList.remove('active');
         }
     });
