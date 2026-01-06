@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const Donation = require('../models/donations');
+const Donation = require('../models/Donations');
 const Expense = require('../models/expense');
 const Budget = require('../models/budget');
 
@@ -54,3 +54,4 @@ router.get('/', async (req, res) => {
 });
 
 module.exports = router;
+
