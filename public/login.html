@@ -439,7 +439,7 @@
         </div>
     </div>
 
-    <script>
+    <!-- <script>
         const API_BASE_URL = 'https://cvecc-saraswati-puja.onrender.com/api';
        //const API_BASE_URL = '/api';
         const loginButton = document.getElementById('loginButton');
@@ -611,10 +611,145 @@
             autoRedirectIfLoggedIn();
             idCardInput.focus();
         });
-    </script>
+    </script> -->
+    <script>
+const API_BASE_URL = 'https://cvecc-saraswati-puja.onrender.com/api';
+
+const loginButton = document.getElementById('loginButton');
+const signupButton = document.getElementById('signupButton');
+const loadingOverlay = document.getElementById('loadingOverlay');
+const idCardInput = document.getElementById('idCardNo');
+const mobileInput = document.getElementById('mobile');
+
+/* =========================
+   CLEAR INVALID SESSION
+========================= */
+function clearInvalidSession() {
+    const user = localStorage.getItem('user');
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    if (!user || isLoggedIn !== 'true') {
+        localStorage.clear();
+    }
+}
+
+/* =========================
+   AUTO REDIRECT IF LOGGED IN
+========================= */
+function autoRedirectIfLoggedIn() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+
+        if (isLoggedIn === 'true' && user && user.role && user.idCardNo) {
+            if (user.role === 'admin' || user.role === 'superadmin') {
+                window.location.href = '/admindashboard.html';
+            } else {
+                window.location.href = '/members.html';
+            }
+        }
+    } catch {
+        localStorage.clear();
+    }
+}
+
+/* =========================
+   LOGIN HANDLER (FIXED)
+========================= */
+loginButton.addEventListener('click', async () => {
+    const idCardNo = idCardInput.value.trim();
+    const mobile = mobileInput.value.trim();
+
+    if (!idCardNo || !mobile) {
+        alert('Please enter ID Card and Mobile Number');
+        return;
+    }
+
+    if (!/^\d{10}$/.test(mobile)) {
+        alert('Enter valid 10-digit mobile number');
+        return;
+    }
+
+    loadingOverlay.classList.add('active');
+    loginButton.disabled = true;
+    const originalHTML = loginButton.innerHTML;
+    loginButton.innerHTML = '<div class="loading"></div> Logging in...';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idCardNo, mobile })
+        });
+
+        const text = await response.text();
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch {
+            throw new Error('Server returned invalid response');
+        }
+
+        if (!response.ok || !data.token || !data.user) {
+            throw new Error(data.message || 'Login failed');
+        }
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('loginTime', new Date().toISOString());
+
+        if (data.user.role === 'admin' || data.user.role === 'superadmin') {
+            window.location.href = '/admindashboard.html';
+        } else {
+            window.location.href = '/members.html';
+        }
+
+    } catch (error) {
+        console.error('Login error:', error);
+        alert(error.message || 'Login failed');
+    } finally {
+        loadingOverlay.classList.remove('active');
+        loginButton.disabled = false;
+        loginButton.innerHTML = originalHTML;
+    }
+});
+
+/* =========================
+   SIGNUP BUTTON
+========================= */
+signupButton.addEventListener('click', () => {
+    window.location.href = 'signup.html';
+});
+
+/* =========================
+   MOBILE INPUT CLEAN
+========================= */
+mobileInput.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 10);
+});
+
+/* =========================
+   ENTER KEY SUPPORT
+========================= */
+document.addEventListener('keypress', e => {
+    if (e.key === 'Enter') loginButton.click();
+});
+
+/* =========================
+   INIT
+========================= */
+document.addEventListener('DOMContentLoaded', () => {
+    clearInvalidSession();
+    autoRedirectIfLoggedIn();
+    idCardInput.focus();
+});
+</script>
+
 </body>
 
 </html>
+
 
 
 
